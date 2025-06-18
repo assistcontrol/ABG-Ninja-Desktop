@@ -1,0 +1,68 @@
+name: Build ABG Ninja (macOS)
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: macOS build
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: aarch64-apple-darwin
+
+      - name: Install pake-cli
+        shell: bash
+        run: npm install pake-cli
+
+      - name: Restore rust cache
+        uses: actions/cache@v4
+        id:   cache-rust
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/README.md') }}
+
+      - name: Install deps
+        run: |
+          npm install shelljs
+          npm install axios
+
+      - name: Build
+        run: npm run pake https://abg.ninja --name ABG-Ninja --icon ./icon.icns --hide-title-bar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ABG-Ninja-macOS-apple-silicon
+          path: ABG-Ninja.dmg
+          retention-days: 3
+
+      - name: Cache rust
+        uses: actions/cache/save@v4
+        if: steps.cache-rust.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/README.md') }}
