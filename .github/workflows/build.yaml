@@ -21,6 +21,9 @@ jobs:
         with:
           node-version: latest
 
+      - name: Install pnpm
+        run:  corepack enable pnpm
+
       - name: Install rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -29,7 +32,7 @@ jobs:
 
       - name: Install pake-cli
         shell: bash
-        run: npm install pake-cli
+        run: pnpm add pake-cli
 
       - name: Restore rust cache
         uses: actions/cache@v4
@@ -44,11 +47,11 @@ jobs:
 
       - name: Install deps
         run: |
-          npm install shelljs
-          npm install axios
+          pnpm add shelljs
+          pnpm add axios
 
       - name: Build
-        run: npm run pake https://abg.ninja --name ABG-Ninja --icon ./icon.icns --hide-title-bar
+        run: pnpm pake https://abg.ninja --name ABG-Ninja --icon ./icon.icns --hide-title-bar
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
