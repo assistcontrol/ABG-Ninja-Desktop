@@ -1,2 +1,2 @@
 # ABG-Ninja-Desktop
-ABG Nina on your desktop!
+ABG Ninja on your desktop!
